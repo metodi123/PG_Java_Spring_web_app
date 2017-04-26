@@ -27,6 +27,7 @@
 						<li><a href="<c:url value="/admin/showEmployees" />">Служители</a></li>
 						<li><a href="<c:url value="/admin/showAdmins" />">Администратори</a></li>
 						<li class="active"><a href="<c:url value="/admin/showParkings" />">Паркинги</a></li>
+						<li><a href="<c:url value="/admin/createPost" />">Съобщение</a></li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Настройки<span class="caret"></span></a>
 							<ul class="dropdown-menu">
@@ -65,6 +66,22 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<label for="hourlyTax" class="col-sm-4 control-label">Географска ширина:</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" name="latitude" id="latitude" value="${parking.location.latitude}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="hourlyTax" class="col-sm-4 control-label">Географска дължина:</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" name="longitude" id="longitude" value="${parking.location.longitude}" required>
+				</div>
+			</div>
+			<div class="row">
+			    <div id="map"></div>
+			</div>
+			
+			<div class="form-group">
 		    	<div class="col-sm-offset-4 col-sm-2">
 		    		<input type="hidden" name="number" value="${parking.number}">
 		      		<button type="submit" class="btn btn-success btn-block">Запази</button>
@@ -87,8 +104,49 @@
     </div>
     <div id="footer">
         <hr>
-        Copyright © 2016 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
+        Copyright © 2017 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
     </div>
 </div>
+<script>
+	function initMap() {
+		var map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 15,
+			center: {lat: <c:out value="${parking.location.latitude}"/>, lng: <c:out value="${parking.location.longitude}"/> }
+		});
+		
+		<c:forEach var="parkingCurrent" items="${parkings}">
+			var message = '<p><strong>Паркинг №<c:out value="${parkingCurrent.number}"/></strong></p><p><c:out value="${parkingCurrent.address}"/></p>';
+		
+			var marker = new google.maps.Marker({
+				position: {
+					lat: <c:out value="${parkingCurrent.location.latitude}"/>,
+					lng: <c:out value="${parkingCurrent.location.longitude}"/>
+				},
+				map: map
+			});
+			attachMessage(marker, message);
+		
+			<c:if test="${parkingCurrent.number == parking.number}">
+				var infowindow = new google.maps.InfoWindow({
+					content: message
+				});
+				infowindow.open(marker.get('map'), marker);
+			</c:if>
+		</c:forEach>
+	}
+
+	function attachMessage(marker, message) {
+		var infowindow = new google.maps.InfoWindow({
+			content: message
+		});
+
+		marker.addListener('click', function() {
+			infowindow.open(marker.get('map'), marker);
+		});
+	}
+</script>
+<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=<c:out value="${mapsApiKey}"/>&callback=initMap">
+</script>
 </body>
 </html>

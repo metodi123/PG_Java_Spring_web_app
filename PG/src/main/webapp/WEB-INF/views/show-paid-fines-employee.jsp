@@ -12,7 +12,7 @@
     <script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js" />"></script>
     <link href="<c:url value="/resources/data_tables/datatables.min.css" />" rel="stylesheet" type="text/css" />
 	<script src="<c:url value="/resources/data_tables/datatables.min.js" />"></script>
-	<script src="<c:url value="/resources/js/load-data-table-appearance.js" />"></script> 
+	<script src="<c:url value="/resources/js/load-data-table-appearance.js" />"></script>
 </head>
 <body>
 <div id="wrapper">
@@ -37,6 +37,8 @@
 							</ul>
 						</li>
 						<li><a href="<c:url value="/employee/showEmployees" />">Служители</a></li>
+						<li><a href="<c:url value="/employee/parkingStatistics" />">Статистика</a></li>
+						<li><a href="<c:url value="/employee/createPost" />">Съобщение</a></li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Настройки<span class="caret"></span></a>
 							<ul class="dropdown-menu">
@@ -99,7 +101,7 @@
 							</tr>
 						</c:forEach>
 			        </tbody>
-				</table>     
+				</table>
 		    </c:when>
 		    <c:otherwise>
 		    	<div class="alert alert-warning" role="alert">
@@ -110,7 +112,7 @@
     </div>
     <div id="footer">
         <hr>
-        Copyright © 2016 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
+        Copyright © 2017 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
     </div>
 </div>
 </body>

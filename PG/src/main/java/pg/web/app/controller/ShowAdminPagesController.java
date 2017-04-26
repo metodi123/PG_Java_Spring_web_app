@@ -1,6 +1,7 @@
 package pg.web.app.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -14,11 +15,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pg.web.app.dao.AdminDAO;
+import pg.web.app.dao.AppPropertyDAO;
 import pg.web.app.dao.EmployeeDAO;
 import pg.web.app.dao.ParkingDAO;
+import pg.web.app.dao.PostDAO;
 import pg.web.app.model.Admin;
+import pg.web.app.model.AppProperty;
 import pg.web.app.model.Employee;
 import pg.web.app.model.Parking;
+import pg.web.app.model.Post;
 import pg.web.app.model.User;
 
 @Controller
@@ -26,7 +31,9 @@ import pg.web.app.model.User;
 public class ShowAdminPagesController {
 	
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public String homeAdmin(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String homeAdmin(HttpServletRequest request, Model model,
+		@RequestParam(name="count", required=false) Integer count,
+		RedirectAttributes redirectAttributes) {
 		
 		if(request.getSession(false) == null) {
 			return "home-admin";
@@ -51,6 +58,31 @@ public class ShowAdminPagesController {
 			}
 			
 			request.getSession().setAttribute(User.CURRENT_USER, admin);
+			
+			PostDAO postDAO = new PostDAO();
+			
+			List<Post> posts = new ArrayList<Post>();
+			
+			posts = postDAO.getAllPosts();
+			
+			List<Post> filteredPosts = new ArrayList<Post>();
+			
+			if(count == null) {
+				count=5;
+			}
+			
+			Iterator<Post> iterator = posts.iterator();
+			
+			int i=0;
+			
+			while(iterator.hasNext() && i<count) {
+				filteredPosts.add(iterator.next());
+				i++;
+			}
+			
+			model.addAttribute("posts", filteredPosts);
+			
+			model.addAttribute("count", count);
 			
 			return "profile-main-admin";
 		}
@@ -221,7 +253,64 @@ public class ShowAdminPagesController {
 		
 		model.addAttribute("parking", parking);
 		
+		List<Parking> parkings = new ArrayList<Parking>();
+		
+		try {
+			parkings = parkingDAO.getAllParkings();
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addAttribute("message", "DatabaseError");
+			return "redirect:/error";
+		}
+		
+		model.addAttribute("parkings", parkings);
+		
+		AppPropertyDAO appPropertyDAO = new AppPropertyDAO();
+		
+		String mapsApiKey = appPropertyDAO.getAppProperty(AppProperty.MAPS_API_KEY).getValue();
+		
+		model.addAttribute("mapsApiKey", mapsApiKey);
+		
 		return "edit-parking-data-admin";
+	}
+	
+	@RequestMapping(value = "/createPost", method = RequestMethod.GET)
+	public String createPostAdmin(HttpServletRequest request, Model model,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/admin";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Admin)) {
+			return "redirect:/error403";
+		}
+		
+		return "create-post-admin";
+	}
+	
+	@RequestMapping(value = "/editPost", method = RequestMethod.GET)
+	public String editPostAdmin(HttpServletRequest request, Model model,
+		@RequestParam(name="id") int id,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/admin";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Admin)) {
+			return "redirect:/error403";
+		}
+		
+		Post post = new Post();
+		
+		PostDAO postDAO = new PostDAO();
+		
+		post = postDAO.getPost(id);
+		
+		model.addAttribute("post", post);
+		
+		return "edit-post-admin";
 	}
 	
 	@RequestMapping(value = "/changePassword", method = RequestMethod.GET)

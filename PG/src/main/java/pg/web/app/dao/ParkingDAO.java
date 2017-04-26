@@ -81,14 +81,7 @@ public class ParkingDAO implements ParkingDataAccess {
 		try {
 			session.beginTransaction();
 			
-			session.createQuery("update Parking set address = :address where number = :number")
-					.setParameter("address", parking.getAddress())
-					.setParameter("number", parking.getNumber())
-					.executeUpdate();
-			session.createQuery("update Parking set hourlyTax = :hourlyTax where number = :number")
-					.setParameter("hourlyTax", parking.getHourlyTax())
-					.setParameter("number", parking.getNumber())
-					.executeUpdate();
+			session.update(parking);
 			
 			session.getTransaction().commit();
 		}
@@ -97,16 +90,14 @@ public class ParkingDAO implements ParkingDataAccess {
 		}
 	}
 	
-	public void deleteParking(int number) {
+	public void deleteParking(Parking parking) {
 		SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Parking.class).buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		
 		try {
 			session.beginTransaction();
 			
-			session.createQuery("delete from Parking where number = :number")
-					.setParameter("number", number)
-					.executeUpdate();
+			session.delete(parking);
 			
 			session.getTransaction().commit();
 		}

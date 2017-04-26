@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Entity
 @Table(name="users")
 @Inheritance(strategy=InheritanceType.JOINED)
-public abstract class User implements Serializable {
+public class User implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -36,6 +36,14 @@ public abstract class User implements Serializable {
 	
 	public User() {
 	
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getUsername() {

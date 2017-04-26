@@ -1,8 +1,12 @@
 package pg.web.app.controller;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,14 +15,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pg.web.app.dao.EmployeeDAO;
 import pg.web.app.dao.FineDAO;
 import pg.web.app.dao.ParkingDAO;
+import pg.web.app.dao.PostDAO;
 import pg.web.app.exception.InvalidParkingParametersException;
+import pg.web.app.exception.InvalidPostParametersException;
 import pg.web.app.exception.InvalidUserParametersException;
 import pg.web.app.model.Admin;
 import pg.web.app.model.Employee;
 import pg.web.app.model.Fine;
 import pg.web.app.model.Parking;
+import pg.web.app.model.ParkingStatistics;
+import pg.web.app.model.Post;
 import pg.web.app.model.User;
 import pg.web.app.service.ParkingParametersValidationService;
+import pg.web.app.service.PostParametersValidationService;
 import pg.web.app.service.UserParametersValidationService;
 
 @Controller
@@ -35,7 +44,7 @@ public class UpdateDatabaseRecordsController {
 			return "redirect:/employee";
 		}
 		
-		if(!(request.getSession(false).getAttribute(pg.web.app.model.User.CURRENT_USER) instanceof Employee)) {
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Employee)) {
 			return "redirect:/error403";
 		}
 		
@@ -52,9 +61,49 @@ public class UpdateDatabaseRecordsController {
 			
 			fineDAO.payFine(fine);
 		}
-		else {
-			return "redirect:/employee/";
+		
+		Parking parking = new Parking();
+		
+		ParkingDAO parkingDAO = new ParkingDAO();
+		
+		Employee employee = new Employee();
+		employee = (Employee) request.getSession(false).getAttribute(User.CURRENT_USER);
+		
+		parking = parkingDAO.getParking(employee.getParkingNumber());
+		
+		int currentYear = LocalDateTime.now().getYear();
+		Month currentMonth = LocalDateTime.now().getMonth();
+		boolean recordIsFound = false;
+		
+		int currentVehicleCount = 0;
+		
+		for(ParkingStatistics parkingStatistics : parking.getParkingStatistics()) {
+			if(parkingStatistics.getYear() == currentYear && parkingStatistics.getMonth().equalsIgnoreCase(currentMonth.toString())) {
+				recordIsFound = true;
+				parkingStatistics.setCurrentVehicleCount(parkingStatistics.getCurrentVehicleCount() - 1);
+				parkingStatistics.setGainings(parkingStatistics.getGainings() + fine.getFinePaymentInfo().getPaidAmount());
+				parkingStatistics.setPaidFinesCount(parkingStatistics.getPaidFinesCount() + 1);
+			}
 		}
+	    
+		if(recordIsFound == false) {
+	    	for(ParkingStatistics parkingStatistics : parking.getParkingStatistics()) {
+	    		if(parkingStatistics.getMonth().equalsIgnoreCase(Month.of(currentMonth.getValue()-1).toString())) {
+					currentVehicleCount = parkingStatistics.getCurrentVehicleCount() - 1;
+				}
+			}
+	    	ParkingStatistics parkingStatistics = new ParkingStatistics();
+			parkingStatistics.setParkingNumber(employee.getParkingNumber());
+			parkingStatistics.setCurrentVehicleCount(currentVehicleCount);
+			parkingStatistics.setGainings(fine.getFinePaymentInfo().getPaidAmount());
+			parkingStatistics.setPaidFinesCount(1);
+			parkingStatistics.setYear(currentYear);
+			parkingStatistics.setMonth(currentMonth.toString());
+			
+			parking.getParkingStatistics().add(parkingStatistics);
+		}
+
+	    parkingDAO.updateParking(parking);
 		
 		return "redirect:/employee/";
 	}
@@ -113,6 +162,8 @@ public class UpdateDatabaseRecordsController {
 		@RequestParam("address") String address,
 		@RequestParam("hourlyTax") double hourlyTax,
 		@RequestParam("number") int number,
+		@RequestParam("latitude") String latitude,
+		@RequestParam("longitude") String longitude,
 		RedirectAttributes redirectAttributes) {
 		
 		if(request.getSession(false) == null) {
@@ -135,6 +186,8 @@ public class UpdateDatabaseRecordsController {
 		
 		parking.setAddress(address);
 		parking.setHourlyTax(hourlyTax);
+		parking.getLocation().setLatitude(latitude);
+		parking.getLocation().setLongitude(longitude);
 		
 		try {
 			ParkingParametersValidationService.validateParkingParameters(parking);
@@ -151,6 +204,88 @@ public class UpdateDatabaseRecordsController {
 		}
 
 		return "redirect:/admin/showParkings";
+	}
+	
+	@RequestMapping(value = "/employee/editPost", method = RequestMethod.POST)
+	public String editPostEmployee(Model model, HttpServletRequest request,
+		@RequestParam("id") int id,
+		@RequestParam("title") String title,
+		@RequestParam("postText") String postText,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/employee";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Employee)) {
+			return "redirect:/error403";
+		}
+		
+		Post post = new Post();
+		
+		PostDAO postDAO = new PostDAO();
+		
+		post = postDAO.getPost(id);
+		
+		post.setTitle(title);
+		post.setText(postText);
+		
+		try {
+			PostParametersValidationService.validatePostParameters(post);
+		} catch (InvalidPostParametersException e) {
+			redirectAttributes.addFlashAttribute("message", "InvalidDataEntered");
+			return "redirect:/employee/editPost";
+		}
+		
+		try {
+			postDAO.updatePost(post);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", "InvalidDataEntered");
+			return "redirect:/employee/editPost";
+		}
+		
+		return "redirect:/employee";
+	}
+	
+	@RequestMapping(value = "/admin/editPost", method = RequestMethod.POST)
+	public String editPostAdmin(Model model, HttpServletRequest request,
+		@RequestParam("id") int id,
+		@RequestParam("title") String title,
+		@RequestParam("postText") String postText,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/admin";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Admin)) {
+			return "redirect:/error403";
+		}
+		
+		Post post = new Post();
+		
+		PostDAO postDAO = new PostDAO();
+		
+		post = postDAO.getPost(id);
+		
+		post.setTitle(title);
+		post.setText(postText);
+		
+		try {
+			PostParametersValidationService.validatePostParameters(post);
+		} catch (InvalidPostParametersException e) {
+			redirectAttributes.addFlashAttribute("message", "InvalidDataEntered");
+			return "redirect:/admin/editPost";
+		}
+		
+		try {
+			postDAO.updatePost(post);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", "InvalidDataEntered");
+			return "redirect:/admin/editPost";
+		}
+		
+		return "redirect:/admin";
 	}
 	
 }

@@ -1,7 +1,10 @@
 package pg.web.app.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,9 +17,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pg.web.app.dao.EmployeeDAO;
 import pg.web.app.dao.FineDAO;
+import pg.web.app.dao.ParkingDAO;
+import pg.web.app.dao.PostDAO;
 import pg.web.app.model.Admin;
 import pg.web.app.model.Employee;
 import pg.web.app.model.Fine;
+import pg.web.app.model.Parking;
+import pg.web.app.model.ParkingStatistics;
+import pg.web.app.model.Post;
 import pg.web.app.model.User;
 
 @Controller
@@ -24,7 +32,9 @@ import pg.web.app.model.User;
 public class ShowEmployeePagesController {
 	
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public String homeEmployee(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String homeEmployee(HttpServletRequest request, Model model,
+		@RequestParam(name="count", required=false) Integer count,
+		RedirectAttributes redirectAttributes) {
 		
 		if(request.getSession(false) == null) {
 			return "home-employee";
@@ -49,6 +59,31 @@ public class ShowEmployeePagesController {
 			}
 			
 			request.getSession().setAttribute(User.CURRENT_USER, employee);
+			
+			PostDAO postDAO = new PostDAO();
+			
+			List<Post> posts = new ArrayList<Post>();
+			
+			posts = postDAO.getAllPosts();
+			
+			List<Post> filteredPosts = new ArrayList<Post>();
+			
+			if(count == null) {
+				count=5;
+			}
+			
+			Iterator<Post> iterator = posts.iterator();
+			
+			int i=0;
+			
+			while(iterator.hasNext() && i<count) {
+				filteredPosts.add(iterator.next());
+				i++;
+			}
+			
+			model.addAttribute("posts", filteredPosts);
+			
+			model.addAttribute("count", count);
 			
 			return "profile-main-employee";
 		}
@@ -190,6 +225,96 @@ public class ShowEmployeePagesController {
 		model.addAttribute("fine", fine);
 		
 		return "pay-fine-employee";
+	}
+	
+	@RequestMapping(value = "/parkingStatistics", method = RequestMethod.GET)
+	public String showParkingStatisticsEmployee(HttpServletRequest request, Model model,
+		@RequestParam(name="year", required=false) Integer year,
+		@RequestParam(name="month", required=false) String month,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/employee";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Employee)) {
+			return "redirect:/error403";
+		}
+		
+		List<Parking> parkings = new ArrayList<Parking>();
+		
+		ParkingDAO parkingDAO = new ParkingDAO();
+		
+		try {
+			parkings = parkingDAO.getAllParkings();
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addAttribute("message", "DatabaseError");
+			return "redirect:/error";
+		}
+		
+		TreeSet<Integer> statisticsYears = new TreeSet<Integer>();
+		
+		for(Parking parking : parkings) {
+			for(ParkingStatistics parkingStatistics : parking.getParkingStatistics()) {
+				statisticsYears.add(parkingStatistics.getYear());
+			}
+		}
+		
+		model.addAttribute("statisticsYears", statisticsYears);
+		
+		model.addAttribute("parkings", parkings);
+		
+		if(year == null) {
+			year = LocalDateTime.now().getYear();
+		}
+		if(month == null) {
+			month = LocalDateTime.now().getMonth().toString();
+		}
+		
+		model.addAttribute("year", year);
+		model.addAttribute("month", month);
+			
+		return "parking-statistics-employee";
+	}
+	
+	@RequestMapping(value = "/createPost", method = RequestMethod.GET)
+	public String createPostEmployee(HttpServletRequest request, Model model,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/employee";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Employee)) {
+			return "redirect:/error403";
+		}
+		
+		return "create-post-employee";
+	}
+	
+	@RequestMapping(value = "/editPost", method = RequestMethod.GET)
+	public String editPostEmployee(HttpServletRequest request, Model model,
+		@RequestParam(name="id") int id,
+		RedirectAttributes redirectAttributes) {
+		
+		if(request.getSession(false) == null) {
+			return "redirect:/employee";
+		}
+		
+		if(!(request.getSession(false).getAttribute(User.CURRENT_USER) instanceof Employee)) {
+			return "redirect:/error403";
+		}
+		
+		Post post = new Post();
+		
+		PostDAO postDAO = new PostDAO();
+		
+		post = postDAO.getPost(id);
+		
+		model.addAttribute("post", post);
+		
+		return "edit-post-employee";
 	}
 	
 	@RequestMapping(value = "/changePassword", method = RequestMethod.GET)

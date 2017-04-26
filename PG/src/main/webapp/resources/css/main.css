@@ -1,6 +1,17 @@
+html {
+	height: 100%;
+}
+
 body {
     margin: 0px;
     text-align: center;
+    height: auto;
+    background: linear-gradient(140deg, #15dbce 0%, #1fc8db 50%, #40c0ef 75%);
+    min-height: 450px;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color:white;
+    opacity:0.95;
 }
 
 #wrapper {
@@ -27,7 +38,7 @@ th {
 	width: 100%;
 	height: auto;
     font-family: sans-serif;
-    color: #4da6ff;
+    color: #f8f8f8;
 }
 
 #menu {
@@ -42,7 +53,7 @@ th {
 	height: auto;
     padding: 0px 10px;
     text-align: justify;
-    min-height: 350px;
+    min-height: 450px;
 }
 
 #loginbox {
@@ -52,8 +63,7 @@ th {
 	text-align: center;
     font-family: sans-serif;
     padding: 75px 10px;
-    min-height: 400px;
-    
+    min-height: 500px;
 }
 
 #footer {
@@ -72,12 +82,58 @@ th {
 
 #fine-info {
 	font-size: 16px;
-	padding-top: 80px;
-	padding-bottom: 100px;
+	padding-top: 30px;
+	padding-bottom: 50px;
+}
+
+#map {
+	margin: 10px auto;
+	height: 380px;
+	width: 100%;
+	border: 1px;
+	border-color: #d9d9d9;
+	border-style: solid;
+	color: black;
+}
+
+#selector-text {
+	margin-top: 35px;
+    margin-bottom: 20px;
 }
 
 .greeting-message {
 	padding-bottom: 30px;
+}
+
+#posts-header {
+	padding: 210px 0px 5px 0px;
+	text-align: center;
+}
+
+.post-resource {
+	padding: 0px 10px 10px 10px;
+	margin-top: 10px;
+	border: solid 1px;
+	border-color: #e0e0e0;
+	border-radius: 10px;
+	background-color: #f8f8f8;
+	color: black;
+}
+
+.edit-post-button {
+	margin-top: 15px;
+}
+
+.post-metadata {
+	font-style: oblique;
+}
+
+table {
+	color: black;
+}
+
+#footer a {
+	color: #f8f8f8;
 }
 
 #logout-button {

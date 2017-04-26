@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Entity
 @Immutable
-@Table(name="unpaied_fines_status_view")
+@Table(name="unpaid_fines_status_view")
 public class UnpaidFinesStatus {
 
 	@Id

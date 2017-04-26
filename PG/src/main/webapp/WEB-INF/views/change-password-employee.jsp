@@ -33,6 +33,8 @@
 							</ul>
 						</li>
 						<li><a href="<c:url value="/employee/showEmployees" />">Служители</a></li>
+						<li><a href="<c:url value="/employee/parkingStatistics" />">Статистика</a></li>
+						<li><a href="<c:url value="/employee/createPost" />">Съобщение</a></li>
 						<li class="dropdown active">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Настройки<span class="caret"></span></a>
 							<ul class="dropdown-menu">
@@ -87,7 +89,7 @@
     </div>
     <div id="footer">
         <hr>
-        Copyright © 2016 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
+        Copyright © 2017 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
     </div>
 </div>
 </body>

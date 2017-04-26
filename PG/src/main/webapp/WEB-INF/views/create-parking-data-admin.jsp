@@ -27,6 +27,7 @@
 						<li><a href="<c:url value="/admin/showEmployees" />">Служители</a></li>
 						<li><a href="<c:url value="/admin/showAdmins" />">Администратори</a></li>
 						<li class="active"><a href="<c:url value="/admin/showParkings" />">Паркинги</a></li>
+						<li><a href="<c:url value="/admin/createPost" />">Съобщение</a></li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Настройки<span class="caret"></span></a>
 							<ul class="dropdown-menu">
@@ -65,6 +66,18 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<label for="hourlyTax" class="col-sm-4 control-label">Географска ширина:</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" name="latitude" id="latitude" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="hourlyTax" class="col-sm-4 control-label">Географска дължина:</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" name="longitude" id="longitude" required>
+				</div>
+			</div>
+			<div class="form-group">
 		    	<div class="col-sm-offset-4 col-sm-2">
 		      		<button type="submit" class="btn btn-success btn-block">Добави</button>
 		    	</div>
@@ -78,7 +91,7 @@
     </div>
     <div id="footer">
         <hr>
-        Copyright © 2016 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
+        Copyright © 2017 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
     </div>
 </div>
 </body>

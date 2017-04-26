@@ -34,6 +34,16 @@ public class Employee extends User implements Serializable {
 	}
 	
 	@Override
+	public int getId() {
+		return super.getId();
+	}
+	
+	@Override
+	public void setId(int id) {
+		super.setId(id);
+	}
+	
+	@Override
 	public String getUsername() {
 		return super.getUsername();
 	}

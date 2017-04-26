@@ -60,7 +60,7 @@
 		<a href="/app/employee">Вход за служител</a>
 		<br>
         <hr>
-        Copyright © 2016 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
+        Copyright © 2017 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
     </div>
 </div>
 </body>

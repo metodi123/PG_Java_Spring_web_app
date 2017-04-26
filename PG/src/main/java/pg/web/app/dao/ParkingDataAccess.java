@@ -13,5 +13,5 @@ public interface ParkingDataAccess {
 	
 	public void updateParking(Parking parking) throws Exception;
 	
-	public void deleteParking(int number) throws Exception;
+	public void deleteParking(Parking parking) throws Exception;
 }

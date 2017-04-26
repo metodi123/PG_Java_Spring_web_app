@@ -18,7 +18,7 @@
 			Възникна проблем с базата данни.
 		</div>
 	</c:if>
-	<button class="btn btn-info" onclick="history.back();" type="button">Обратно</button>
+	<button class="btn btn-primary" onclick="history.back();" type="button">Обратно</button>
 </div>
 </body>
 </html>

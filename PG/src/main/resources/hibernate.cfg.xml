@@ -24,6 +24,9 @@
 	   	
 		<mapping class="pg.web.app.model.FinePaymentInfo"/>
 		<mapping class="pg.web.app.model.UnpaidFinesStatus"/>
+		<mapping class="pg.web.app.model.Location"/>
+		<mapping class="pg.web.app.model.ParkingStatistics"/>
+		<mapping class="pg.web.app.model.User"/>
 
 	</session-factory>
 	

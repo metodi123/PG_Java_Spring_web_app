@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pg.web.app.dao.AppPropertyDAO;
 import pg.web.app.dao.FineDAO;
 import pg.web.app.dao.ParkingDAO;
 import pg.web.app.exception.InvalidFineParametersException;
 import pg.web.app.model.Admin;
+import pg.web.app.model.AppProperty;
 import pg.web.app.model.Employee;
 import pg.web.app.model.Fine;
 import pg.web.app.model.Parking;
@@ -27,7 +29,7 @@ public class ShowPagesController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
-
+		
 		if(request.getSession(false) == null) {
 			return "home";
 		}
@@ -83,6 +85,24 @@ public class ShowPagesController {
 		
 		model.addAttribute("fine", fine);
 		model.addAttribute("parking", parking);
+		
+		List<Parking> parkings = new ArrayList<Parking>();
+		
+		try {
+			parkings = parkingDAO.getAllParkings();
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addAttribute("message", "DatabaseError");
+			return "redirect:/error";
+		}
+		
+		model.addAttribute("parkings", parkings);
+		
+		AppPropertyDAO appPropertyDAO = new AppPropertyDAO();
+		
+		String mapsApiKey = appPropertyDAO.getAppProperty(AppProperty.MAPS_API_KEY).getValue();
+		
+		model.addAttribute("mapsApiKey", mapsApiKey);
 		
 		return "show-fine-info";
 	}

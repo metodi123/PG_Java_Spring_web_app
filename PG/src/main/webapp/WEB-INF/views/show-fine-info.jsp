@@ -40,27 +40,70 @@
 		    	<div class="col-sm-6">
 		    		<p class="control-static"><c:out value="${parking.address}"/></p>
 				</div>
-		    </div>
-		    
+			</div>
+			<div class="row">
+			    <div id="map"></div>
+			</div>
 			<div class="row">
 				<br>
 				<div class="col-sm-offset-3 col-sm-6">
 					<c:if test="${message == 'InvalidData'}">
-		    			<div class="alert alert-warning" role="alert">
-		   					Въведени са невалидни данни.
-		   				</div>
+			    		<div class="alert alert-warning" role="alert">
+			   				Въведени са невалидни данни.
+			   			</div>
 					</c:if>
 				</div>
 			</div>
 			<div class="col-sm-offset-5 col-sm-7">
-				<button class="btn btn-info text-right" onclick="history.back();" type="button">Обратно</button>
+				<button class="btn btn-primary text-right" onclick="history.back();" type="button">Обратно</button>
 			</div>
-		</form>
+		</div>
 	</div>
 	<div id="footer">
         <hr>
-        Copyright © 2016 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
+        Copyright © 2017 Metodi Metodiev&nbsp;&nbsp;&nbsp;All Rights Reserved
     </div>
 </div>
+<script>
+	function initMap() {
+		var map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 15,
+			center: {lat: <c:out value="${parking.location.latitude}"/>, lng: <c:out value="${parking.location.longitude}"/> }
+		});
+		
+		<c:forEach var="parkingCurrent" items="${parkings}">
+			var message = '<p><strong>Паркинг №<c:out value="${parkingCurrent.number}"/></strong></p><p><c:out value="${parkingCurrent.address}"/></p>';
+		
+			var marker = new google.maps.Marker({
+				position: {
+					lat: <c:out value="${parkingCurrent.location.latitude}"/>,
+					lng: <c:out value="${parkingCurrent.location.longitude}"/>
+				},
+				map: map
+			});
+			attachMessage(marker, message);
+		
+			<c:if test="${parkingCurrent.number == parking.number}">
+				var infowindow = new google.maps.InfoWindow({
+					content: message
+				});
+				infowindow.open(marker.get('map'), marker);
+			</c:if>
+		</c:forEach>
+	}
+
+	function attachMessage(marker, message) {
+		var infowindow = new google.maps.InfoWindow({
+			content: message
+		});
+
+		marker.addListener('click', function() {
+			infowindow.open(marker.get('map'), marker);
+		});
+	}
+</script>
+<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=<c:out value="${mapsApiKey}"/>&callback=initMap">
+</script>
 </body>
 </html>

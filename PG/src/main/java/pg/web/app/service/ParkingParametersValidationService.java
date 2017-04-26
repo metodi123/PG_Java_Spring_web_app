@@ -8,6 +8,7 @@ import pg.web.app.model.Parking;
 @Service
 public class ParkingParametersValidationService {
 	public static final int PARAMETERS_MAX_LENGTH = 70;
+	public static final int PARAMETERS_LOCATION_MAX_LENGTH = 25;
 	
 	public static final int NUMBER_PARAMETERS_MIN_VALUE = 0;
 	public static final int NUMBER_PARAMETERS_MAX_VALUE = 1000;
@@ -16,6 +17,8 @@ public class ParkingParametersValidationService {
 		validateParameter(parking.getNumber(), NUMBER_PARAMETERS_MIN_VALUE, NUMBER_PARAMETERS_MAX_VALUE);
 		validateParameter(parking.getAddress(), PARAMETERS_MAX_LENGTH);
 		validateParameter(parking.getHourlyTax(), NUMBER_PARAMETERS_MIN_VALUE, NUMBER_PARAMETERS_MAX_VALUE);
+		validateParameter(parking.getLocation().getLatitude(), PARAMETERS_LOCATION_MAX_LENGTH);
+		validateParameter(parking.getLocation().getLongitude(), PARAMETERS_LOCATION_MAX_LENGTH);
 	}
 
 	public static void validateParameter(String parameter, int maxLength) throws InvalidParkingParametersException  {
