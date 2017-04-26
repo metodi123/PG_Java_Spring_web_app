@@ -23,4 +23,4 @@ Some of the technologies used in the development process are:
 - JavaScript
 
 <br />
-Copyright © 2016, Metodi Metodiev
+Copyright © 2017, Metodi Metodiev
